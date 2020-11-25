@@ -1,11 +1,11 @@
 {
   "name": "wxmp-rsa",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "兼容微信小程序的rsa加解密库，支持超长文本和中文字符",
   "author": "neohan",
   "main": "dist/index.min.js",
   "scripts": {
-    "uglify": "uglifyjs src/index.js -c -m -o dist/index.min.js"
+    "build": "terser src/index.js -c -m --comments false -o dist/index.min.js"
   },
   "keywords": [
     "wxmp",
@@ -23,6 +23,6 @@
     "url": "git://github.com/neohan666/wxmp-rsa.git"
   },
   "devDependencies": {
-    "uglify-js": "^3.11.6"
+    "terser": "^5.5.0"
   }
 }
