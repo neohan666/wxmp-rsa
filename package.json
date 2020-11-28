@@ -1,6 +1,6 @@
 {
   "name": "wxmp-rsa",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "兼容微信小程序的rsa加解密库，支持超长文本和中文字符",
   "author": "neohan",
   "main": "dist/index.min.js",
