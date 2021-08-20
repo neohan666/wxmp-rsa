@@ -1,18 +1,18 @@
 {
   "name": "wxmp-rsa",
-  "version": "1.1.1",
-  "description": "兼容微信小程序的rsa加解密库，支持超长文本和中文字符",
+  "version": "2.0.0",
+  "description": "兼容小程序环境的rsa加解密库，支持超长文本和中文字符",
   "author": "neohan",
-  "main": "dist/index.min.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "terser src/index.js -c -m --comments false -o dist/index.min.js"
+    "build": "tsc"
   },
   "keywords": [
     "wxmp",
     "rsa",
     "jsencrypt",
-    "js",
-    "long"
+    "crypt",
+    "miniprogram"
   ],
   "license": "MIT",
   "files": [
@@ -23,6 +23,6 @@
     "url": "git://github.com/neohan666/wxmp-rsa.git"
   },
   "devDependencies": {
-    "terser": "^5.5.0"
+    "typescript": "^4.3.5"
   }
 }
