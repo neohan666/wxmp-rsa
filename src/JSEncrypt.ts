@@ -105,8 +105,9 @@ export class JSEncrypt {
         count = count || 0
         let res: string = ''
         const maxLen = ((this.getKey().n.bitLength() + 7) >> 3) - 11
-        if (text.length > maxLen) {
-            const textArr = text.match(new RegExp('.{1,' + Math.floor(maxLen / 3) + '}', 'g'))
+        const splitMax = Math.floor(maxLen / 3)
+        if (text.length > splitMax) {
+            const textArr = text.match(new RegExp('.{1,' + splitMax + '}', 'g'))
             textArr.forEach(v => {
                 res += this.getKey().encrypt(v)
             })
