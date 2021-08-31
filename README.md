@@ -13,7 +13,7 @@ npm i wxmp-rsa -S
 ```
 
 ### 3、使用方式
-（小程序使用之前需先使用开发者工具构建npm）
+（小程序使用之前需先使用开发者工具[构建npm](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html)）
 ```js
 // 导入包
 import WxmpRsa from 'wxmp-rsa'
@@ -62,14 +62,16 @@ rsa.setPrivateKey(privateKey)
 const originalStr = rsa.decryptLong(cryptStr)
 console.log('解密后的原始数据：', originalStr)
 ```
-其他api参考jsencrypt插件：https://github.com/travist/jsencrypt
+其他api参考[jsencrypt](https://github.com/travist/jsencrypt)插件
 
 ### 4、注意事项
 + 填空方式默认`pkcs1`，目前暂不支持其它填空方式。
-+ 之前版本中偶现的加密异常的问题已修复。
-+ v2.0.1版本的解密存在问题：使用本插件解密中英文混杂的数据时可能出现部分中文乱码的情况，尚待修复。
 
-### 5、测试
+### 5、更新提示
++ 之前偶现的加密异常的问题已于v2.0.0+版本中修复。
++ 之前偶现的解密后部分中文乱码的问题已于v2.1.0+版本中修复。
+
+### 6、测试对比
 推荐两个第三方rsa工具，仅供参考。
 + 在线生成rsa公私钥：http://travistidwell.com/jsencrypt/demo/ （推荐1024长度的密钥）
 + 在线rsa加解密：http://www.toolzl.com/tools/testrsa.html （117超长加密，128超长解密）

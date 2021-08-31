@@ -86,44 +86,22 @@ var JSEncrypt = /** @class */ (function () {
         }
     };
     // 超长文本加密
-    JSEncrypt.prototype.encryptLong = function (text, count) {
-        var _this = this;
-        count = count || 0;
-        var res = '';
-        var maxLen = ((this.getKey().n.bitLength() + 7) >> 3) - 11;
-        if (text.length > maxLen) {
-            var textArr = text.match(new RegExp('.{1,' + Math.floor(maxLen / 3) + '}', 'g'));
-            textArr.forEach(function (v) {
-                res += _this.getKey().encrypt(v);
-            });
-        }
-        else {
-            res = this.getKey().encrypt(text);
-        }
+    JSEncrypt.prototype.encryptLong = function (str) {
         try {
-            res = hex2b64(res);
+            return hex2b64(this.getKey().encryptLong(str));
         }
         catch (ex) {
             return false;
         }
-        return res;
     };
     // 超长文本解密
-    JSEncrypt.prototype.decryptLong = function (text) {
-        var _this = this;
-        var res = '';
-        var maxLen = (this.getKey().n.bitLength() + 7) >> 3;
-        var hexText = b64tohex(text);
-        if (hexText.length > maxLen) {
-            var hexTextArr = hexText.match(new RegExp('.{1,' + maxLen * 2 + '}', 'g'));
-            hexTextArr.forEach(function (v) {
-                res += _this.getKey().decrypt(v);
-            });
+    JSEncrypt.prototype.decryptLong = function (str) {
+        try {
+            return this.getKey().decryptLong(b64tohex(str));
         }
-        else {
-            res = this.getKey().decrypt(hexText);
+        catch (ex) {
+            return false;
         }
-        return res;
     };
     /**
      * Proxy method for RSAKey object's sign.

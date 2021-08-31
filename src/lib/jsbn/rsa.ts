@@ -322,11 +322,63 @@ export class RSAKey {
         return digest == digestMethod(text).toString();
     }
 
+    public encryptLong (text: string) {
+        let res = ''
+        const maxLen = ((this.n.bitLength() + 7) >> 3) - 11
+        const textArr = this.setSplitChn(text, maxLen)
+        textArr.forEach(v => {
+            res += this.encrypt(v)
+        })
+        return res
+    } 
+    public decryptLong (ctext: string) {
+        let res = ''
+        const maxLen = (this.n.bitLength() + 7) >> 3
+        const splitMaxLen = maxLen * 2
+        if (ctext.length > splitMaxLen) {
+            const ctextArr = ctext.match(new RegExp('.{1,' + splitMaxLen + '}', 'g')) || []
+            const mArr = []
+            for (let i = 0; i < ctextArr.length; i++) {
+                const c = parseBigInt(ctextArr[i], 16);
+                const m = this.doPrivate(c);
+                if (m == null) { return null; }
+                mArr.push(m)
+            }
+            res = pkcs1unpad2Long(mArr, maxLen);
+        } else {
+            res = this.decrypt(ctext)
+        }
+        return res
+    }
+    private setSplitChn (str: string, maxLen: number, res: string[] = []): string[] {
+        const arr = str.split('')
+        let len = 0
+        for (let i = 0; i < arr.length; i++) {
+            const charCode = arr[i].charCodeAt(0)
+            if (charCode <= 0x007f) {
+                len += 1
+            } else if(charCode <= 0x07ff){
+                len += 2
+            } else if(charCode <= 0xffff){
+                len += 3
+            } else{
+                len += 4
+            }
+            if (len > maxLen) {
+                const currentStr = str.substring(0, i)
+                res.push(currentStr)
+                return this.setSplitChn(str.substring(i), maxLen, res)
+            }
+        }
+        res.push(str)
+        return res
+    }
+
     //#endregion PUBLIC
 
-    public n:BigInteger;
+    protected n:BigInteger;
     protected e:number;
-    public d:BigInteger;
+    protected d:BigInteger;
     protected p:BigInteger;
     protected q:BigInteger;
     protected dmp1:BigInteger;
@@ -348,6 +400,40 @@ function pkcs1unpad2(d:BigInteger, n:number):string {
     while (b[i] != 0) {
         if (++i >= b.length) { return null; }
     }
+    let ret = "";
+    while (++i < b.length) {
+        const c = b[i] & 255;
+        if (c < 128) { // utf-8 decode
+            ret += String.fromCharCode(c);
+        } else if ((c > 191) && (c < 224)) {
+            ret += String.fromCharCode(((c & 31) << 6) | (b[i + 1] & 63));
+            ++i;
+        } else {
+            ret += String.fromCharCode(((c & 15) << 12) | ((b[i + 1] & 63) << 6) | (b[i + 2] & 63));
+            i += 2;
+        }
+    }
+    return ret;
+}
+
+function pkcs1unpad2Long (dArr: BigInteger[], n: number): string {
+    let bArr: number[] = []
+    for (let j = 0; j < dArr.length; j++) {
+        const d = dArr[j]
+        const b = d.toByteArray();
+        let i = 0;
+        while (i < b.length && b[i] == 0) { ++i; }
+        if (b.length - i != n - 1 || b[i] != 2) {
+            return null;
+        }
+        ++i;
+        while (b[i] != 0) {
+            if (++i >= b.length) { return null; }
+        }
+        bArr = bArr.concat(b.slice(i + 1))
+    }
+    const b = bArr
+    let i = -1
     let ret = "";
     while (++i < b.length) {
         const c = b[i] & 255;

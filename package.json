@@ -1,6 +1,6 @@
 {
   "name": "wxmp-rsa",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "兼容小程序环境的rsa加解密库，支持超长文本和中文字符",
   "author": "neohan",
   "main": "dist/index.js",

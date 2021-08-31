@@ -302,6 +302,65 @@ var RSAKey = /** @class */ (function () {
         var digest = removeDigestHeader(unpadded);
         return digest == digestMethod(text).toString();
     };
+    RSAKey.prototype.encryptLong = function (text) {
+        var _this = this;
+        var res = '';
+        var maxLen = ((this.n.bitLength() + 7) >> 3) - 11;
+        var textArr = this.setSplitChn(text, maxLen);
+        textArr.forEach(function (v) {
+            res += _this.encrypt(v);
+        });
+        return res;
+    };
+    RSAKey.prototype.decryptLong = function (ctext) {
+        var res = '';
+        var maxLen = (this.n.bitLength() + 7) >> 3;
+        var splitMaxLen = maxLen * 2;
+        if (ctext.length > splitMaxLen) {
+            var ctextArr = ctext.match(new RegExp('.{1,' + splitMaxLen + '}', 'g')) || [];
+            var mArr = [];
+            for (var i = 0; i < ctextArr.length; i++) {
+                var c = parseBigInt(ctextArr[i], 16);
+                var m = this.doPrivate(c);
+                if (m == null) {
+                    return null;
+                }
+                mArr.push(m);
+            }
+            res = pkcs1unpad2Long(mArr, maxLen);
+        }
+        else {
+            res = this.decrypt(ctext);
+        }
+        return res;
+    };
+    RSAKey.prototype.setSplitChn = function (str, maxLen, res) {
+        if (res === void 0) { res = []; }
+        var arr = str.split('');
+        var len = 0;
+        for (var i = 0; i < arr.length; i++) {
+            var charCode = arr[i].charCodeAt(0);
+            if (charCode <= 0x007f) {
+                len += 1;
+            }
+            else if (charCode <= 0x07ff) {
+                len += 2;
+            }
+            else if (charCode <= 0xffff) {
+                len += 3;
+            }
+            else {
+                len += 4;
+            }
+            if (len > maxLen) {
+                var currentStr = str.substring(0, i);
+                res.push(currentStr);
+                return this.setSplitChn(str.substring(i), maxLen, res);
+            }
+        }
+        res.push(str);
+        return res;
+    };
     return RSAKey;
 }());
 export { RSAKey };
@@ -321,6 +380,45 @@ function pkcs1unpad2(d, n) {
             return null;
         }
     }
+    var ret = "";
+    while (++i < b.length) {
+        var c = b[i] & 255;
+        if (c < 128) { // utf-8 decode
+            ret += String.fromCharCode(c);
+        }
+        else if ((c > 191) && (c < 224)) {
+            ret += String.fromCharCode(((c & 31) << 6) | (b[i + 1] & 63));
+            ++i;
+        }
+        else {
+            ret += String.fromCharCode(((c & 15) << 12) | ((b[i + 1] & 63) << 6) | (b[i + 2] & 63));
+            i += 2;
+        }
+    }
+    return ret;
+}
+function pkcs1unpad2Long(dArr, n) {
+    var bArr = [];
+    for (var j = 0; j < dArr.length; j++) {
+        var d = dArr[j];
+        var b_1 = d.toByteArray();
+        var i_1 = 0;
+        while (i_1 < b_1.length && b_1[i_1] == 0) {
+            ++i_1;
+        }
+        if (b_1.length - i_1 != n - 1 || b_1[i_1] != 2) {
+            return null;
+        }
+        ++i_1;
+        while (b_1[i_1] != 0) {
+            if (++i_1 >= b_1.length) {
+                return null;
+            }
+        }
+        bArr = bArr.concat(b_1.slice(i_1 + 1));
+    }
+    var b = bArr;
+    var i = -1;
     var ret = "";
     while (++i < b.length) {
         var c = b[i] & 255;

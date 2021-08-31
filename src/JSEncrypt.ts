@@ -100,42 +100,24 @@ export class JSEncrypt {
             return false;
         }
     }
+
     // 超长文本加密
-    public encryptLong (text: string, count?: number) {
-        count = count || 0
-        let res: string = ''
-        const maxLen = ((this.getKey().n.bitLength() + 7) >> 3) - 11
-        const splitMax = Math.floor(maxLen / 3)
-        if (text.length > splitMax) {
-            const textArr = text.match(new RegExp('.{1,' + splitMax + '}', 'g'))
-            textArr.forEach(v => {
-                res += this.getKey().encrypt(v)
-            })
-        } else {
-            res = this.getKey().encrypt(text)
-        }
+    public encryptLong (str: string) {
         try {
-            res = hex2b64(res)
+            return hex2b64(this.getKey().encryptLong(str));
         } catch (ex) {
-            return false
+            return false;
         }
-        return res
     }
     // 超长文本解密
-    public decryptLong (text: string) {
-        let res: string = ''
-        const maxLen = (this.getKey().n.bitLength() + 7) >> 3
-        const hexText = b64tohex(text)
-        if (hexText.length > maxLen) {
-            const hexTextArr = hexText.match(new RegExp('.{1,' + maxLen * 2 + '}', 'g'))
-            hexTextArr.forEach(v => {
-                res += this.getKey().decrypt(v)
-            })
-        } else {
-            res = this.getKey().decrypt(hexText)
+    public decryptLong (str: string) {
+        try {
+            return this.getKey().decryptLong(b64tohex(str));
+        } catch (ex) {
+            return false;
         }
-        return res
     }
+
     /**
      * Proxy method for RSAKey object's sign.
      * @param {string} str the string to sign
