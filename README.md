@@ -71,5 +71,5 @@ console.log('解密后的原始数据：', originalStr)
 
 ### 5、测试
 推荐两个第三方rsa工具，仅供参考。
-+ 在线生成rsa公私钥：http://travistidwell.com/jsencrypt/demo/ （推荐1024k长度的密钥）
++ 在线生成rsa公私钥：http://travistidwell.com/jsencrypt/demo/ （推荐1024长度的密钥）
 + 在线rsa加解密：http://www.toolzl.com/tools/testrsa.html （117超长加密，128超长解密）
