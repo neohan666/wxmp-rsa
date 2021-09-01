@@ -1,9 +1,9 @@
-;(function (global, factory) {
+; (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined'
     ? factory(exports)
     : typeof define === 'function' && define.amd
-    ? define(['exports'], factory)
-    : factory((global.JSEncrypt = {}))
+      ? define(['exports'], factory)
+      : factory((global.JSEncrypt = {}))
 })(this, function (exports) {
   'use strict'
 
@@ -486,7 +486,7 @@ and limitations under the License.
     }
     Stream.prototype.parseStringUTF = function (start, end) {
       var s = ''
-      for (var i = start; i < end; ) {
+      for (var i = start; i < end;) {
         var c = this.get(i++)
         if (c < 128) {
           s += String.fromCharCode(c)
@@ -502,7 +502,7 @@ and limitations under the License.
       var str = ''
       var hi
       var lo
-      for (var i = start; i < end; ) {
+      for (var i = start; i < end;) {
         hi = this.get(i++)
         lo = this.get(i++)
         str += String.fromCharCode((hi << 8) | lo)
@@ -899,7 +899,7 @@ and limitations under the License.
         } else {
           // undefined length
           try {
-            for (;;) {
+            for (; ;) {
               var s = ASN1.decode(stream)
               if (s.tag.isEOC()) {
                 break
@@ -2521,7 +2521,7 @@ and limitations under the License.
   //#region REDUCERS
   //#region NullExp
   var NullExp = /** @class */ (function () {
-    function NullExp() {}
+    function NullExp() { }
     // NullExp.prototype.convert = nNop;
     NullExp.prototype.convert = function (x) {
       return x
@@ -2941,7 +2941,7 @@ and limitations under the License.
     return rng_state.next()
   }
   var SecureRandom = /** @class */ (function () {
-    function SecureRandom() {}
+    function SecureRandom() { }
     SecureRandom.prototype.nextBytes = function (ba) {
       for (var i = 0; i < ba.length; ++i) {
         ba[i] = rng_get_byte()
@@ -3074,11 +3074,14 @@ and limitations under the License.
         return null
       }
       var h = c.toString(16)
-      if ((h.length & 1) == 0) {
-        return h
+      var str = (h.length & 1) == 0 ? h : '0' + h;
+
+      if (str.length == 256) {
+        return str
       } else {
-        return '0' + h
+        return this.encrypt(text); // 递归重新计算
       }
+
     }
     // RSAKey.prototype.setPrivate = RSASetPrivate;
     // Set the private key fields N, e, and d from hex strings
@@ -3114,14 +3117,14 @@ and limitations under the License.
       var qs = B >> 1
       this.e = parseInt(E, 16)
       var ee = new BigInteger(E, 16)
-      for (;;) {
-        for (;;) {
+      for (; ;) {
+        for (; ;) {
           this.p = new BigInteger(B - qs, 1, rng)
           if (this.p.subtract(BigInteger.ONE).gcd(ee).compareTo(BigInteger.ONE) == 0 && this.p.isProbablePrime(10)) {
             break
           }
         }
-        for (;;) {
+        for (; ;) {
           this.q = new BigInteger(qs, 1, rng)
           if (this.q.subtract(BigInteger.ONE).gcd(ee).compareTo(BigInteger.ONE) == 0 && this.q.isProbablePrime(10)) {
             break
@@ -3339,7 +3342,7 @@ version: 2.9.0
         throw new Error('YAHOO.lang.extend failed, please check that ' + 'all dependencies are included.')
       }
 
-      var F = function () {}
+      var F = function () { }
       F.prototype = superc.prototype
       subc.prototype = new F()
       subc.prototype.constructor = subc
@@ -3365,7 +3368,7 @@ version: 2.9.0
          * @static
          * @private
          */
-        var _IEEnumFix = function () {},
+        var _IEEnumFix = function () { },
           ADD = ['toString', 'valueOf']
         try {
           if (/MSIE/.test(navigator.userAgent)) {
@@ -3379,7 +3382,7 @@ version: 2.9.0
               }
             }
           }
-        } catch (ex) {}
+        } catch (ex) { }
         _IEEnumFix(subc.prototype, overrides)
       }
     },
@@ -5473,6 +5476,13 @@ version: 2.9.0
         textArr.forEach(function (v) {
           res += that.encrypt(v)
         })
+        // textArr.forEach(function (t) {
+          // let str = that.encrypt(t);
+          // while (str.length != 256) { // 超长文本,会方法加密失败的问题，出现长度不等于256的加密字符串，原本1%的概率在超长文本的情况下几乎必现
+          //   str = that.encrypt(t);
+          // }
+          // res += str
+        // })
       } else {
         res = this.encrypt(text)
       }
